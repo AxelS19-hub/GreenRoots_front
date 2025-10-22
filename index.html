@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Roots - Construyendo un Futuro Verde</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a8269">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>Green Roots</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#inicio" class="nav-link">Inicio</a></li>
+                    <li><a href="#informacion" class="nav-link">Información</a></li>
+                    <li><a href="#actividades" class="nav-link">Actividades</a></li>
+                    <li><a href="#voluntariado" class="nav-link">Voluntariado</a></li>
+                    <li><a href="#novedades" class="nav-link" id="novedades-link">Novedades</a></li>
+                    <li><a href="/login.html" class="nav-link" id="login-link">Iniciar Sesión / Registro</a></li>
+                    <li><a href="#" class="nav-link" id="dashboard-link" style="display: none;" onclick="showDashboard()">Mi Dashboard</a></li>
+                    <li><a href="#" class="nav-link" id="logout-link" style="display: none;" onclick="logout()">Cerrar Sesión</a></li>
+                    <li><a href="/gobierno.html" class="nav-link">Panel de Gobierno</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="inicio" class="hero">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h2 class="hero-title">Construyamos un Futuro Verde Juntos</h2>
+                    <p class="hero-subtitle">Green Roots es una comunidad comprometida con la reforestación y la consciencia ambiental. Únete a nosotros para hacer la diferencia.</p>
+                    <button class="cta-button" onclick="scrollToSection('informacion')">
+                        Descubre Más <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+                <div class="hero-image">
+                    <div class="floating-elements">
+                        <div class="floating-leaf leaf-1"><i class="fas fa-leaf"></i></div>
+                        <div class="floating-leaf leaf-2"><i class="fas fa-leaf"></i></div>
+                        <div class="floating-leaf leaf-3"><i class="fas fa-leaf"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Information Section -->
+        <section id="informacion" class="info-section">
+            <div class="container">
+                <h2 class="section-title">La Importancia de Nuestros Bosques</h2>
+                
+                <div class="info-grid">
+                    <div class="info-card positive">
+                        <div class="card-icon">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <h3>Beneficios de la Reforestación</h3>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Absorbe CO2 y produce oxígeno</li>
+                            <li><i class="fas fa-check"></i> Previene la erosión del suelo</li>
+                            <li><i class="fas fa-check"></i> Conserva la biodiversidad</li>
+                            <li><i class="fas fa-check"></i> Regula el ciclo del agua</li>
+                            <li><i class="fas fa-check"></i> Mejora la calidad del aire</li>
+                            <li><i class="fas fa-check"></i> Crea empleos sostenibles</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card negative">
+                        <div class="card-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Consecuencias de la Deforestación</h3>
+                        <ul>
+                            <li><i class="fas fa-times"></i> Aumento de gases de efecto invernadero</li>
+                            <li><i class="fas fa-times"></i> Pérdida de especies animales</li>
+                            <li><i class="fas fa-times"></i> Desertificación y erosión</li>
+                            <li><i class="fas fa-times"></i> Alteración del clima local</li>
+                            <li><i class="fas fa-times"></i> Reducción de recursos hídricos</li>
+                            <li><i class="fas fa-times"></i> Impacto en comunidades locales</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="statistics">
+                    <h3>Datos Alarmantes</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-number">18.7M</span>
+                            <span class="stat-label">Hectáreas perdidas anualmente</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">80%</span>
+                            <span class="stat-label">De especies terrestres viven en bosques</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">1.6B</span>
+                            <span class="stat-label">Personas dependen de los bosques</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">30%</span>
+                            <span class="stat-label">Del territorio mundial son bosques</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activities Section -->
+        <section id="actividades" class="activities-section">
+            <div class="container">
+                <h2 class="section-title">Actividades</h2>
+                <h3 class="activity-title">Planta un árbol y deja que tus raíces crezcan con él.</h3>
+                <p class="activity-subtitle">
+                    Planta un árbol y conéctate con él en todo momento. Podrás cuidarlo, regarlo y seguir su crecimiento en tiempo real. 
+                    Tu nuevo amigo verde estará siempre contigo, recordándote que juntos construyen un futuro más vivo y más limpio.
+                </p>
+                
+                <div class="map-container">
+                    <h4>Mapa Interactivo - Monterrey</h4>
+                    <div id="monterrey-map" class="interactive-map">
+                        <div class="map-overlay">
+                            <h5>Puntos de Reforestación en Monterrey</h5>
+                            <p>Haz clic en los puntos rojos para ver ubicaciones de plantación</p>
+                        </div>
+                        <!-- Puntos GPS se generarán dinámicamente -->
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <span class="legend-dot red"></span>
+                            <span>Puntos de plantación activos</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-dot green"></span>
+                            <span>Árboles ya plantados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Volunteer Section -->
+        <section id="voluntariado" class="volunteer-section">
+            <div class="container">
+                <h2 class="section-title">Únete a Nuestro Voluntariado</h2>
+                <p class="section-subtitle">Forma parte del cambio. Registrátete y ayúdanos a reforestar nuestro planeta.</p>
+                
+                <div class="volunteer-content">
+                    <div class="volunteer-info">
+                        <h3>¿Por qué ser voluntario?</h3>
+                        <div class="benefits-list">
+                            <div class="benefit-item">
+                                <i class="fas fa-hands-helping"></i>
+                                <span>Contribuyes directamente al medio ambiente</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-users"></i>
+                                <span>Conoces personas con ideales similares</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-certificate"></i>
+                                <span>Recibes certificados de participación</span>
+                            </div>
+                            <div class="benefit-item">
+                                <i class="fas fa-trophy"></i>
+                                <span>Acceso a retos y premiaciones especiales</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form class="volunteer-form" id="volunteerForm">
+                        <h3>Registro de Voluntario</h3>
+                        <div class="form-group">
+                            <label for="nombre">Nombre completo</label>
+                            <input type="text" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Correo electrónico</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telefono">Teléfono</label>
+                            <input type="tel" id="telefono" name="telefono" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edad">Edad</label>
+                            <select id="edad" name="edad" required>
+                                <option value="">Selecciona tu rango de edad</option>
+                                <option value="18-25">18-25 años</option>
+                                <option value="26-35">26-35 años</option>
+                                <option value="36-45">36-45 años</option>
+                                <option value="46-55">46-55 años</option>
+                                <option value="56+">56+ años</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="disponibilidad">Disponibilidad</label>
+                            <select id="disponibilidad" name="disponibilidad" required>
+                                <option value="">Selecciona tu disponibilidad</option>
+                                <option value="fines-de-semana">Fines de semana</option>
+                                <option value="entre-semana">Entre semana</option>
+                                <option value="flexible">Horario flexible</option>
+                                <option value="eventos-especiales">Solo eventos especiales</option>
+                            </select>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="terminos" name="terminos" required>
+                            <label for="terminos">Acepto los términos y condiciones</label>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-seedling"></i>
+                            Unirme al Voluntariado
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section (Initially Hidden) -->
+        <section id="novedades" class="news-section" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">Novedades para Voluntarios</h2>
+                <div class="news-content">
+                    <div class="welcome-message">
+                        <h3>¡Bienvenido al equipo Green Roots! 🌱</h3>
+                        <p>Gracias por unirte a nuestra comunidad. Como voluntario registrado, tendrás acceso a contenido exclusivo y actividades especiales.</p>
+                    </div>
+                    
+                    <div class="upcoming-features">
+                        <h3>Próximamente</h3>
+                        <div class="features-grid">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-medal"></i>
+                                </div>
+                                <h4>Retos Ecológicos</h4>
+                                <p>Participa en desafíos mensuales para ganar puntos y reconocimientos por tu contribución al medio ambiente.</p>
+                                <div class="coming-soon">Próximamente</div>
+                            </div>
+                            
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-award"></i>
+                                </div>
+                                <h4>Premiaciones Ecológicas</h4>
+                                <p>Sistema de recompensas para voluntarios destacados, incluyendo certificados, plantas gratuitas y más.</p>
+                                <div class="coming-soon">Próximamente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dashboard Section (Initially Hidden) -->
+        <section id="dashboard" class="dashboard-section" style="display: none;">
+            <div class="container">
+                <h2 class="section-title">Mi Panel de Voluntario</h2>
+                <div class="dashboard-welcome">
+                    <h3>¡Bienvenido, <span id="dashboardUserName">Voluntario</span>!</h3>
+                    <p>Gestiona tus actividades de reforestación y monitorea tu impacto ambiental</p>
+                </div>
+                
+                <!-- Quick Stats -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon trees">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Árboles Plantados</h4>
+                            <span class="stat-number">12</span>
+                            <span class="stat-trend">+3 este mes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon impact">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>CO2 Absorbido</h4>
+                            <span class="stat-number">284kg</span>
+                            <span class="stat-trend">+67kg este mes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon activities">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Actividades</h4>
+                            <span class="stat-number">8</span>
+                            <span class="stat-trend">Completadas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon rank">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Ranking</h4>
+                            <span class="stat-number">#47</span>
+                            <span class="stat-trend">↑12 posiciones</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div class="dashboard-content">
+                    <div class="dashboard-panel">
+                        <h3><i class="fas fa-seedling"></i> Mis Árboles</h3>
+                        <div class="trees-list">
+                            <div class="tree-item">
+                                <div class="tree-image">
+                                    <i class="fas fa-tree" style="color: #27ae60;"></i>
+                                </div>
+                                <div class="tree-info">
+                                    <h4>Roble #001</h4>
+                                    <p>Plantado: 15 Mar 2024</p>
+                                    <div class="tree-health">
+                                        <span class="health-indicator excellent"></span>
+                                        <span>Excelente salud</span>
+                                    </div>
+                                </div>
+                                <div class="tree-actions">
+                                    <button class="action-btn"><i class="fas fa-tint"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                            <div class="tree-item">
+                                <div class="tree-image">
+                                    <i class="fas fa-tree" style="color: #2ecc71;"></i>
+                                </div>
+                                <div class="tree-info">
+                                    <h4>Pino #002</h4>
+                                    <p>Plantado: 22 Feb 2024</p>
+                                    <div class="tree-health">
+                                        <span class="health-indicator good"></span>
+                                        <span>Buena salud</span>
+                                    </div>
+                                </div>
+                                <div class="tree-actions">
+                                    <button class="action-btn"><i class="fas fa-tint"></i></button>
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel">
+                        <h3><i class="fas fa-calendar-alt"></i> Próximas Actividades</h3>
+                        <div class="activities-list">
+                            <div class="activity-item">
+                                <div class="activity-date">
+                                    <span class="day">15</span>
+                                    <span class="month">ABR</span>
+                                </div>
+                                <div class="activity-info">
+                                    <h4>Jornada de Plantación</h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> Cerro de la Silla</p>
+                                    <p><i class="fas fa-clock"></i> 8:00 AM - 12:00 PM</p>
+                                </div>
+                                <button class="join-btn">Unirse</button>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-date">
+                                    <span class="day">22</span>
+                                    <span class="month">ABR</span>
+                                </div>
+                                <div class="activity-info">
+                                    <h4>Mantenimiento de Árboles</h4>
+                                    <p><i class="fas fa-map-marker-alt"></i> Parque Fundidora</p>
+                                    <p><i class="fas fa-clock"></i> 9:00 AM - 1:00 PM</p>
+                                </div>
+                                <button class="join-btn">Unirse</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-panel">
+                        <h3><i class="fas fa-medal"></i> Logros Recientes</h3>
+                        <div class="achievements-list">
+                            <div class="achievement-item">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Primer Árbol</h4>
+                                    <p>Plantaste tu primer árbol</p>
+                                    <span class="achievement-date">15 Mar 2024</span>
+                                </div>
+                            </div>
+                            <div class="achievement-item">
+                                <div class="achievement-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="achievement-info">
+                                    <h4>Voluntario Activo</h4>
+                                    <p>Participaste en 5 actividades</p>
+                                    <span class="achievement-date">28 Mar 2024</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-seedling"></i>
+                        <h3>Green Roots</h3>
+                    </div>
+                    <p>Construyendo un futuro verde, un árbol a la vez.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="#inicio">Inicio</a></li>
+                        <li><a href="#informacion">Información</a></li>
+                        <li><a href="#actividades">Actividades</a></li>
+                        <li><a href="#voluntariado">Voluntariado</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contacto</h4>
+                    <p><i class="fas fa-envelope"></i> info@greenroots.com</p>
+                    <p><i class="fas fa-phone"></i> +52 81 1234 5678</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Green Roots. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('SW registered successfully');
+                })
+                .catch((error) => {
+                    console.log('SW registration failed');
+                });
+        }
+    </script>
+</body>
+</html>
