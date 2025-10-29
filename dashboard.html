@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Roots - Dashboard Voluntario</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#4a8269">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>Green Roots</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="/dashboard.html" class="nav-link active">Mi Dashboard</a></li>
+                    <li><a href="/gobierno.html" class="nav-link">Panel de Gobierno</a></li>
+                    <li><a href="#" class="nav-link" onclick="logout()">Cerrar Sesión</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1>¡Bienvenido, <span id="dashboardUserName">Voluntario</span>!</h1>
+                <p>Gestiona tus actividades de reforestación y monitorea tu impacto ambiental</p>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon trees">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Árboles Plantados</h3>
+                        <span class="stat-number">12</span>
+                        <span class="stat-trend positive">+3 este mes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon impact">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>CO2 Absorbido</h3>
+                        <span class="stat-number">284kg</span>
+                        <span class="stat-trend positive">+67kg este mes</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon activities">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Actividades</h3>
+                        <span class="stat-number">8</span>
+                        <span class="stat-trend neutral">Completadas</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon rank">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Ranking</h3>
+                        <span class="stat-number">#47</span>
+                        <span class="stat-trend positive">↑12 posiciones</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- My Trees Panel -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-seedling"></i> Mis Árboles</h3>
+                        <button class="panel-btn">Ver Todos</button>
+                    </div>
+                    <div class="trees-list">
+                        <div class="tree-item">
+                            <div class="tree-image">
+                                <i class="fas fa-tree" style="color: #27ae60;"></i>
+                            </div>
+                            <div class="tree-info">
+                                <h4>Roble #001</h4>
+                                <p>Plantado: 15 Mar 2024</p>
+                                <div class="tree-health">
+                                    <span class="health-indicator excellent"></span>
+                                    <span>Excelente salud</span>
+                                </div>
+                            </div>
+                            <div class="tree-actions">
+                                <button class="action-btn"><i class="fas fa-tint"></i></button>
+                                <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                            </div>
+                        </div>
+                        <div class="tree-item">
+                            <div class="tree-image">
+                                <i class="fas fa-tree" style="color: #2ecc71;"></i>
+                            </div>
+                            <div class="tree-info">
+                                <h4>Pino #002</h4>
+                                <p>Plantado: 22 Feb 2024</p>
+                                <div class="tree-health">
+                                    <span class="health-indicator good"></span>
+                                    <span>Buena salud</span>
+                                </div>
+                            </div>
+                            <div class="tree-actions">
+                                <button class="action-btn"><i class="fas fa-tint"></i></button>
+                                <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                            </div>
+                        </div>
+                        <div class="tree-item">
+                            <div class="tree-image">
+                                <i class="fas fa-tree" style="color: #f39c12;"></i>
+                            </div>
+                            <div class="tree-info">
+                                <h4>Encino #003</h4>
+                                <p>Plantado: 8 Ene 2024</p>
+                                <div class="tree-health">
+                                    <span class="health-indicator warning"></span>
+                                    <span>Necesita cuidado</span>
+                                </div>
+                            </div>
+                            <div class="tree-actions">
+                                <button class="action-btn"><i class="fas fa-tint"></i></button>
+                                <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Activities Panel -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Próximas Actividades</h3>
+                        <button class="panel-btn">Agendar</button>
+                    </div>
+                    <div class="activities-list">
+                        <div class="activity-item">
+                            <div class="activity-date">
+                                <span class="day">15</span>
+                                <span class="month">ABR</span>
+                            </div>
+                            <div class="activity-info">
+                                <h4>Jornada de Plantación</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> Cerro de la Silla</p>
+                                <p><i class="fas fa-clock"></i> 8:00 AM - 12:00 PM</p>
+                            </div>
+                            <button class="join-btn">Unirse</button>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-date">
+                                <span class="day">22</span>
+                                <span class="month">ABR</span>
+                            </div>
+                            <div class="activity-info">
+                                <h4>Mantenimiento de Árboles</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> Parque Fundidora</p>
+                                <p><i class="fas fa-clock"></i> 9:00 AM - 1:00 PM</p>
+                            </div>
+                            <button class="join-btn">Unirse</button>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-date">
+                                <span class="day">29</span>
+                                <span class="month">ABR</span>
+                            </div>
+                            <div class="activity-info">
+                                <h4>Taller de Educación Ambiental</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> Centro Comunitario</p>
+                                <p><i class="fas fa-clock"></i> 10:00 AM - 2:00 PM</p>
+                            </div>
+                            <button class="join-btn">Unirse</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impact Chart Panel -->
+                <div class="dashboard-panel chart-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-chart-area"></i> Mi Impacto Ambiental</h3>
+                        <div class="chart-controls">
+                            <button class="chart-btn active">Mes</button>
+                            <button class="chart-btn">Trimestre</button>
+                            <button class="chart-btn">Año</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Achievements Panel -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-medal"></i> Logros Recientes</h3>
+                        <button class="panel-btn">Ver Todos</button>
+                    </div>
+                    <div class="achievements-list">
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-seedling"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <h4>Primer Árbol</h4>
+                                <p>Plantaste tu primer árbol</p>
+                                <span class="achievement-date">15 Mar 2024</span>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <h4>Voluntario Activo</h4>
+                                <p>Participaste en 5 actividades</p>
+                                <span class="achievement-date">28 Mar 2024</span>
+                            </div>
+                        </div>
+                        <div class="achievement-item">
+                            <div class="achievement-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="achievement-info">
+                                <h4>Eco Warrior</h4>
+                                <p>Absorbiste 250kg de CO2</p>
+                                <span class="achievement-date">5 Abr 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Panel -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-trophy"></i> Ranking de Voluntarios</h3>
+                        <button class="panel-btn">Ver Completo</button>
+                    </div>
+                    <div class="leaderboard-list">
+                        <div class="leaderboard-item">
+                            <div class="rank gold">1</div>
+                            <div class="user-avatar">M</div>
+                            <div class="user-info">
+                                <h4>María González</h4>
+                                <p>45 árboles plantados</p>
+                            </div>
+                            <div class="points">1,250 pts</div>
+                        </div>
+                        <div class="leaderboard-item">
+                            <div class="rank silver">2</div>
+                            <div class="user-avatar">J</div>
+                            <div class="user-info">
+                                <h4>Juan Pérez</h4>
+                                <p>38 árboles plantados</p>
+                            </div>
+                            <div class="points">980 pts</div>
+                        </div>
+                        <div class="leaderboard-item">
+                            <div class="rank bronze">3</div>
+                            <div class="user-avatar">A</div>
+                            <div class="user-info">
+                                <h4>Ana López</h4>
+                                <p>32 árboles plantados</p>
+                            </div>
+                            <div class="points">850 pts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions Panel -->
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-bolt"></i> Acciones Rápidas</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="action-card">
+                            <i class="fas fa-seedling"></i>
+                            <span>Plantar Árbol</span>
+                        </button>
+                        <button class="action-card">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Agendar Actividad</span>
+                        </button>
+                        <button class="action-card">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Compartir Logro</span>
+                        </button>
+                        <button class="action-card">
+                            <i class="fas fa-download"></i>
+                            <span>Descargar Certificado</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/dashboard.js"></script>
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('SW registered successfully');
+                })
+                .catch((error) => {
+                    console.log('SW registration failed');
+                });
+        }
+
+        // Check session on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDashboardSession();
+        });
+
+        async function checkDashboardSession() {
+            try {
+                const cache = await caches.open('green-roots-v1.0.0');
+                const sessionResponse = await cache.match('/api/session');
+                
+                if (sessionResponse) {
+                    const userData = await sessionResponse.json();
+                    const loginTime = new Date(userData.loginTime);
+                    const now = new Date();
+                    const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                    
+                    if (hoursDiff < 24) {
+                        // Session is valid, update UI
+                        document.getElementById('dashboardUserName').textContent = userData.name || userData.email.split('@')[0];
+                        return;
+                    }
+                }
+                
+                // No valid session, redirect to login
+                window.location.href = '/login.html';
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function logout() {
+            try {
+                const cache = await caches.open('green-roots-v1.0.0');
+                await cache.delete('/api/session');
+                showNotification('Sesión cerrada exitosamente', 'success');
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1000);
+            } catch (error) {
+                window.location.href = '/index.html';
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                         type === 'error' ? 'fa-exclamation-circle' : 
+                         'fa-info-circle';
+            
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <i class="fas ${icon}"></i>
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="closeNotification(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                closeNotification(notification.querySelector('.notification-close'));
+            }, 5000);
+        }
+
+        function closeNotification(button) {
+            const notification = button.closest('.notification');
+            notification.style.animation = 'slideOutRight 0.5s ease forwards';
+            setTimeout(() => {
+                notification.remove();
+            }, 500);
+        }
+    </script>
+</body>
+</html>
