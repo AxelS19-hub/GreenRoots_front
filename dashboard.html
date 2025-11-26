@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Voluntario - Green Roots</title>
+    
+    <link rel="manifest" href="/manifest.json"> 
+    <link rel="stylesheet" href="/base.css"> 
+    <link rel="stylesheet" href="/header.css"> 
+    <link rel="stylesheet" href="/dashboard.css"> 
+    <link rel="website icon" type="png" href="/favicon/favicon-16x16.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+/* Estilos para el modal de registro de árbol (mantener aquí) */
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; 
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+}
+.close-btn:hover,
+.close-btn:focus {
+    color: var(--danger-red);
+    text-decoration: none;
+    cursor: pointer;
+}
+.registro-arbol-form .submit-btn {
+    background: linear-gradient(45deg, var(--primary-green), var(--accent-green));
+    color: var(--white);
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* ESTILOS ADAPTADOS PARA EL PANEL DE SENSORES (3 CARDS) */
+.sensor-data {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas iguales */
+    gap: 15px;
+    padding: 1rem 0;
+}
+
+.data-card {
+    text-align: center;
+    padding: 15px 10px; /* Reducido el padding para que quepan */
+    border-radius: 10px;
+    background-color: var(--bg-light); 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    min-width: 0; /* Asegura que no desborde en móvil */
+}
+
+.data-card i {
+    font-size: 1.5rem; /* Icono más pequeño */
+    margin-bottom: 0.2rem;
+}
+
+.hum-card i { color: #4682b4; /* Azul (Humedad) */ }
+.lat-card i { color: #f39c12; /* Naranja (Latitud) */ }
+.lon-card i { color: #c0392b; /* Rojo (Longitud) */ }
+
+.data-value {
+    display: block;
+    font-size: 1.8rem; /* Valor más pequeño para coordenadas */
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+    overflow-wrap: break-word; /* Para manejar números largos */
+    word-break: break-all;
+}
+
+.data-unit {
+    font-size: 0.8rem; /* Unidad más pequeña */
+    color: var(--text-light);
+    margin-top: 5px;
+}
+
+/* ESTILOS NUEVOS PARA EL MAPA */
+#mapContainer {
+    height: 350px; /* Altura fija para el mapa */
+    border-radius: 10px;
+    margin-top: 15px;
+    z-index: 1; /* Necesario para que el mapa se muestre correctamente */
+}
+.map-panel {
+    /* Ocupa el espacio que antes era del Quick Actions/Chart, si es necesario */
+    grid-column: span 1; 
+}
+
+/* Estilos para la lista de árboles */
+.arboles-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 0;
+    list-style: none;
+}
+
+.arbol-item {
+    background: var(--light-bg);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow);
+    border-left: 5px solid var(--accent-green);
+    transition: var(--transition);
+}
+
+.arbol-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #ddd;
+    padding-bottom: 5px;
+}
+
+.tree-species {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-green);
+}
+
+.item-detail {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 5px 0;
+}
+
+.item-detail i {
+    color: var(--accent-green);
+    margin-right: 5px;
+}
+
+.status-pendiente {
+    background-color: var(--warning-orange);
+    color: var(--white);
+}
+
+.status-aprobado {
+    background-color: var(--success-green);
+    color: var(--white);
+}
+
+.status-rechazado {
+    background-color: var(--danger-red);
+    color: var(--white);
+}
+
+.tree-status {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Estilos para el toggle de la sección de árboles */
+.hidden-section {
+    display: none !important; 
+}
+
+/* Ajuste de Flexbox para la tarjeta */
+#arbolesStatCard {
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out; 
+    /* 🚨 CLAVE: Usamos flex para separar el contenido y la flecha */
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+}
+#arbolesStatCard:hover {
+    transform: translateY(-3px);
+}
+
+/* 🚨 NUEVO: Estilos para la flecha */
+.toggle-arrow {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    transition: transform 0.3s ease; /* Transición suave para la rotación */
+    margin-left: 10px; /* Espacio entre el texto y la flecha */
+}
+
+/* 🚨 NUEVO: Clase para rotar la flecha (apunta hacia abajo cuando está abierto) */
+.toggle-arrow.rotated {
+    transform: rotate(90deg); /* Rota 90 grados a la derecha */
+}
+/* 🚨 FIN NUEVO CSS */
+
+.notificacion-humedad {
+    padding: 10px 15px;
+    border-radius: 10px; /* Consistente con otros elementos del dashboard */
+    font-weight: 600;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 90%; 
+    max-width: 400px;
+    margin: 0 auto; /* Para centrar la notificación */
+    font-size: 0.95rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.notificacion-humedad i {
+    font-size: 1.2rem;
+}
+
+/* Clases de Estado basadas en base.css */
+/* ÉXITO: Humedad 20% a 50% */
+.status-success {
+    background-color: var(--light-green); 
+    color: var(--primary-green); 
+    border: 1px solid var(--accent-green);
+}
+
+/* ADVERTENCIA: Humedad < 20% (Necesita agua) */
+.status-warning {
+    background-color: #fff3cd; /* Amarillo suave */
+    color: var(--warning-orange); 
+    border: 1px solid var(--warning-orange);
+}
+
+/* PELIGRO: Humedad > 50% (Se está ahogando) */
+.status-danger {
+    background-color: #f8d7da; /* Rojo suave */
+    color: var(--danger-red); 
+    border: 1px solid var(--danger-red);
+}
+
+/* dashboard.css */
+
+/* 1. Expansión del panel y posicionamiento relativo para el botón */
+.impacto-expandido {
+    /* Ocupa el doble de columnas (ajusta 'span 2' si tu cuadrícula tiene más de 3 columnas) */
+    grid-column: span 2; 
+    width: 152%;
+    /* CLAVE: Esto establece el panel como el punto de referencia (0,0) para el botón absoluto */
+    position: relative; 
+}
+
+/* 2. Asegura que el contenido del encabezado no se solape con el botón */
+.impacto-expandido .panel-header {
+    /* Ajusta el padding para dejar espacio al botón */
+    padding-right: 120px; 
+}
+
+
+
+@media (max-width: 900px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Columna única en tablet/móvil */
+    }
+    /* Asegurar que la tarjeta se vea bien en móvil */
+    .stat-card {
+        padding: 15px; 
+    }
+    /* Permite que el contenido del stat card (título, número) ocupe su propio espacio */
+    #arbolesStatCard .stat-content {
+        flex-grow: 1;
+        margin-right: 15px;
+    }
+}
+
+@media (max-width: 600px) {
+    .sensor-data {
+        grid-template-columns: 1fr; /* Una sola columna en móvil */
+    }
+}
+
+
+    </style>
+
+    <script>
+        // LÓGICA DE PROTECCIÓN DE RUTA
+        function protectRoute(allowedRoles) {
+            const userDataJSON = localStorage.getItem("usuario");
+            const loginPage = "login.html";
+            const homePage = "index.html"; 
+
+            if (!userDataJSON) {
+                window.location.replace(loginPage);
+                return false;
+            }
+
+            const userData = JSON.parse(userDataJSON);
+            const userRol = userData.rol?.trim(); 
+
+            const userRolLower = userRol?.toLowerCase();
+            const allowedRolesLower = allowedRoles.map(r => r.toLowerCase());
+            
+            if (!userRol || !allowedRolesLower.includes(userRolLower)) {
+                alert("Acceso denegado. Solo el rol Voluntario tiene acceso a este panel.");
+                window.location.replace(homePage);
+                return false;
+            }
+            return true;
+        }
+
+        const isAllowed = protectRoute(['voluntario']);
+        
+        if (!isAllowed) {
+            // Esto detiene la ejecución del resto del script si la redirección ocurre
+            throw new Error("Acceso no autorizado. Redirección en curso."); 
+        }
+    </script>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-seedling"></i>
+                    <h1>Green Roots</h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="/dashboard.html" class="nav-link active">Dashboard</a></li>
+                    <li id="gobiernoLink" style="display: none;"><a href="/gobierno.html" class="nav-link">Panel de Gobierno</a></li> 
+                    <li><a href="/index.html" class="nav-link">Inicio</a></li>
+                </ul>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="userName">Voluntario</span>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Cerrar Sesión
+                    </button>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <div class="welcome-section">
+                <h1>¡Bienvenido a tu Dashboard! <span id="saludoNombre"></span></h1>
+                <p>Gestiona tus actividades de reforestación y monitorea tu impacto ambiental</p>
+            </div>
+
+            <div class="quick-stats">
+                <div class="stat-card" id="arbolesStatCard" role="button" tabindex="0">
+                    <div style="display: flex; align-items: center;">
+                        <div class="stat-icon trees"> <i class="fas fa-tree"></i> </div>
+                        <div class="stat-content">
+                            <h3>Árboles Plantados</h3>
+                            <span class="stat-number" id="arbolesPlantados">0</span>
+                            <span class="stat-trend positive" id="arbolesMes">+0 este mes</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right toggle-arrow" id="arbolesToggleArrow"></i>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon activities"> <i class="fas fa-calendar-check"></i> </div>
+                    <div class="stat-content">
+                        <h3>Actividades</h3>
+                        <span class="stat-number" id="numEventos">0</span>
+                        <span class="stat-trend neutral">Eventos próximos</span>
+                    </div>
+                </div>
+                <div class="stat-card ranking-card-wrapper"> 
+    <div class="card ranking-card">
+        <div class="card-header">
+            <h3>🏆 Ranking de Voluntarios</h3>
+        </div>
+        <div class="card-body">
+            <div id="myRankPosition" class="my-rank-summary">
+                <p>Calculando tu posición...</p>
+            </div>
+            
+            <div id="rankingListContainer" class="ranking-list">
+                <p>Cargando lista de voluntarios...</p>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+
+            <section class="dashboard-panel" id="arbolesRegistradosSection">
+                <h2 class="panel-title">Mis Árboles Registrados</h2>
+                <div class="panel-actions">
+                    <button id="refreshArbolesBtn" class="action-btn-mini">
+                        <i class="fas fa-sync-alt"></i> Actualizar
+                    </button>
+                </div>
+                <div id="arbolesListContainer" class="list-container">
+                    <p class="loading-message">Cargando tus árboles...</p>
+                </div>
+            </section>
+
+            <div class="dashboard-grid">
+                
+                <div class="dashboard-panel map-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-map-marked-alt"></i> Ubicación del Sensor</h3>
+                    </div>
+                    <div id="mapContainer">
+                        </div>
+                </div>
+                
+                <div class="dashboard-panel sensor-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-microchip"></i> Monitoreo del Sensor (Datos en Tiempo Real)</h3>
+                        <span id="estado-firebase" style="font-size: 0.8rem; color: var(--text-light);"><i class="fas fa-circle-notch fa-spin"></i> Inicializando...</span>
+                    </div>
+                    <div class="sensor-data">
+                        
+                        <div class="data-card hum-card">
+                            <i class="fas fa-tint"></i>
+                            <h4>Humedad</h4>
+                            <span class="data-value" id="humedad-sensor">--</span>
+                            <span class="data-unit">%</span>
+                        </div>
+                        
+                        <div class="data-card lat-card">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <h4>Latitud</h4>
+                            <span class="data-value" id="latitud-sensor">--</span>
+                            <span class="data-unit">°</span>
+                        </div>
+                        
+                        <div class="data-card lon-card">
+                            <i class="fas fa-globe-americas"></i>
+                            <h4>Longitud</h4>
+                            <span class="data-value" id="longitud-sensor">--</span>
+                            <span class="data-unit">°</span>
+                        </div>
+                    </div>
+                    <p style="text-align: center; margin-top: 10px; font-size: 0.85rem; color: var(--text-light);">Datos de GreenRoots RTDB. Actualización: <span id="ultima-actualizacion">--</span></p>
+                    
+                    <div id="humedad-notificacion" class="notificacion-humedad" style="display: none; margin-top: 15px;">
+                        <i class="fas fa-spinner fa-pulse"></i> Cargando estado...
+                    </div>
+                </div>
+                
+                <div class="dashboard-panel">
+                    <div class="panel-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Próximas Actividades</h3>
+                        <button class="panel-btn" id="refreshEventosBtn"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                    <div class="activities-list" id="eventosContainer">
+                        <p style="padding: 1.5rem;"><i class="fas fa-spinner fa-spin"></i> Cargando eventos...</p>
+                    </div>
+                </div>
+                
+                <div class="dashboard-panel chart-panel impacto-expandido">
+    
+    <div class="panel-header">
+        <h3><i class="fas fa-chart-area"></i> Mi Impacto Ambiental</h3>
+        <div class="chart-controls">
+            <button class="chart-btn active">Mes</button>
+            <button class="chart-btn">Año</button>
+            <button class="chart-btn-register-tree" id="openRegistroModalBtn" title="Registrar un Nuevo Árbol">
+                <span>Registrar Árbol</span>
+            </button>
+        </div>
+    </div>
+    
+    
+    
+    <div class="chart-container">
+        <canvas id="impactChart"></canvas>
+    </div>
+</div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Green Roots. Panel de Voluntario.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <div id="registroModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2><i class="fas fa-tree" style="color: var(--primary-green);"></i> Registrar Árbol Plantado</h2>
+            <form id="registroArbolForm" class="registro-arbol-form login-form" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label for="tipoArbol"><i class="fas fa-leaf"></i> Tipo de Árbol</label>
+                    <input type="text" id="tipoArbol" placeholder="Ej: Pino Silvestre" required>
+                </div>
+                <div class="form-group">
+                    <label for="ubicacionGps"><i class="fas fa-map-marker-alt"></i> Ubicación GPS (Lat, Lon)</label>
+                    <input type="text" id="ubicacionGps" placeholder="Haga click en 'Obtener GPS'" readonly required>
+                    <button type="button" id="btnGetGps" class="submit-btn" style="background: var(--warning-orange); font-size: 0.9rem;"><i class="fas fa-map-marker-alt"></i> Obtener GPS Actual</button>
+                </div>
+                <div class="form-group">
+                    <label for="fotoArbol"><i class="fas fa-camera"></i> Adjuntar Foto y Evidencia</label>
+                    <input type="file" id="fotoArbol" accept="image/*" required>
+                </div>
+                <button type="submit" class="submit-btn"><i class="fas fa-leaf"></i> Registrar Árbol</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // CONFIGURACIÓN INICIAL
+        const API_URL = "https://greenroots-web.onrender.com/api"; 
+        const userDataJSON = localStorage.getItem("usuario");
+        const userData = userDataJSON ? JSON.parse(userDataJSON) : null;
+        
+        let firebaseApp; 
+        let db; 
+
+        let map; // Variable global para la instancia del mapa
+        let currentMarker = null; // Variable para el marcador del sensor
+        let impactChartInstance = null;
+
+        const modal = document.getElementById("registroModal");
+        const btnOpenModal = document.getElementById("openRegistroModalBtn");
+        const btnCloseModal = document.getElementsByClassName("close-btn")[0];
+        
+        // Coordenadas predeterminadas (ejemplo: Chelsea, MA)
+        const DEFAULT_LAT = 42.3936888;
+        const DEFAULT_LON = -71.0412802;
+
+
+        // ===============================================
+        // 1. FUNCIONES DE FIREBASE
+        // ===============================================
+
+        /**
+         * Inicializa el mapa Leaflet en el contenedor 'mapContainer'.
+         */
+        function initializeMap() {
+            // Inicializa el mapa centrado en una ubicación por defecto
+            map = L.map('mapContainer').setView([DEFAULT_LAT, DEFAULT_LON], 13);
+
+            // Añade la capa de tiles (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            console.log("✅ Mapa Leaflet inicializado con éxito.");
+        }
+
+
+        /**
+         * Obtiene la configuración de la API, inicializa el SDK de Firebase 
+         * y AUTENTICA la conexión usando el token del backend.
+         */
+        async function initializeFirebase() {
+            // Se asume que el token y la config vienen de tu backend
+            const firebaseToken = localStorage.getItem('firebaseToken'); 
+            const estadoElement = document.getElementById('estado-firebase');
+
+            if (!userData) {
+                estadoElement.textContent = "Usuario no autenticado.";
+                return false;
+            }
+
+            try {
+                estadoElement.textContent = "Obteniendo configuración...";
+                
+                // Usamos una configuración estática para la demo, asumiendo que el backend 
+                // usa la URL de tu RTDB (lo más crítico para este caso de uso)
+                const firebaseConfig = {
+                    databaseURL: "https://greenroot-6dbfe-default-rtdb.firebaseio.com/"
+                };
+                
+                // 2. INICIALIZACIÓN DE FIREBASE CORE
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                db = firebase.database(); 
+                
+                estadoElement.textContent = "Conectado al RTDB.";
+                console.log("✅ Conexión de Firebase inicializada con éxito.");
+                
+                // NOTA: La lógica de autenticación se omite según el código original
+                
+                return true;
+                
+            } catch (error) { 
+                console.error("❌ Fallo al inicializar Firebase:", error);
+                estadoElement.textContent = `ERROR: ${error.message.split(":")[0] || "No se pudo conectar"}`;
+                return false;
+            }
+        }
+        /**
+         * Determina y muestra la notificación de riego basada en la lectura de humedad.
+         * @param {number} humedad - La lectura de humedad del sensor (0-100).
+         */
+        function updateHumedadNotification(humedad) {
+            const notificacionElement = document.getElementById('humedad-notificacion');
+            if (!notificacionElement) return;
+
+            notificacionElement.style.display = 'flex'; // Mostrar el elemento
+
+            let mensaje = '';
+            let claseStatus = '';
+            let icono = '';
+            
+            const humDisplay = humedad.toFixed(0);
+
+            // Lógica de umbrales solicitada
+            if (humedad > 50) {
+                // > 50%: Se está ahogando (PELIGRO)
+                mensaje = `¡ALERTA! La planta **se está ahogando** (${humDisplay}%).`;
+                claseStatus = 'status-danger';
+                icono = 'fas fa-exclamation-triangle';
+            } else if (humedad >= 20 && humedad <= 50) {
+                // 20% - 50%: Está bien de agua (ÉXITO)
+                mensaje = `La planta **está bien de agua** (${humDisplay}%).`;
+                claseStatus = 'status-success';
+                icono = 'fas fa-check-circle';
+            } else { // Humedad < 20
+                // < 20%: Necesita agua (ADVERTENCIA)
+                mensaje = `La planta **necesita agua** (${humDisplay}%).`;
+                claseStatus = 'status-warning';
+                icono = 'fas fa-hand-holding-water';
+            }
+            
+            notificacionElement.innerHTML = `<i class="${icono}"></i> ${mensaje}`;
+            // Asigna la clase de estado actual
+            notificacionElement.className = 'notificacion-humedad ' + claseStatus; 
+        }
+        /**
+         * Monitorea datos del nodo /greenroots en tiempo real (Realtime Database)
+         * y actualiza el mapa.
+         */
+        function loadSensorData() {
+            if (!db) {
+                console.warn("No se puede iniciar el monitoreo: Firebase DB no está inicializada.");
+                return;
+            }
+
+            // Referencia al nodo principal de datos '/greenroots'
+            const greenrootsRef = db.ref('greenroots'); 
+            
+            // Elementos del DOM a actualizar
+            const humElement = document.getElementById('humedad-sensor');
+            const latElement = document.getElementById('latitud-sensor');
+            const lonElement = document.getElementById('longitud-sensor');
+            const estadoElement = document.getElementById('estado-firebase');
+            const ultimaActElement = document.getElementById('ultima-actualizacion');
+            
+            greenrootsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                
+                // Elemento de notificación
+                const notifElement = document.getElementById('humedad-notificacion');
+
+                if (data) {
+                    // 1. Obtener y actualizar los valores en el panel
+                    // Usamos humedadNum para la lógica y humedad (string con .toFixed(1)) para el DOM.
+                    const humedadNum = data.humedad !== undefined ? parseFloat(data.humedad) : null;
+                    const humedad = humedadNum !== null ? humedadNum.toFixed(1) : '--';
+
+                    const latitud = data.latitud !== undefined ? parseFloat(data.latitud) : null;
+                    const longitud = data.longitud !== undefined ? parseFloat(data.longitud) : null;
+
+                    humElement.textContent = humedad;
+                    latElement.textContent = latitud !== null ? latitud.toFixed(6) : '--';
+                    lonElement.textContent = longitud !== null ? longitud.toFixed(6) : '--';
+                    
+                    // -------------------------------------------------------------------
+                    // 2. LLAMADA A LA FUNCIÓN DE NOTIFICACIÓN DE HUMEDAD (AQUÍ VA)
+                    // -------------------------------------------------------------------
+                    if (humedadNum !== null) {
+                        updateHumedadNotification(humedadNum); 
+                    } else if (notifElement) {
+                        // Si hay datos pero la humedad es nula, mostrar mensaje de dato faltante
+                        notifElement.className = 'notificacion-humedad status-warning'; 
+                        notifElement.innerHTML = '<i class="fas fa-exclamation-circle"></i> Dato de humedad no disponible.';
+                        notifElement.style.display = 'flex';
+                    }
+                    
+                    // 3. Actualizar el marcador en el mapa
+                    if (map && latitud !== null && longitud !== null) {
+                        const newLatLng = new L.LatLng(latitud, longitud);
+
+                        if (currentMarker) {
+                            // Mueve el marcador existente a la nueva posición
+                            currentMarker.setLatLng(newLatLng);
+                            currentMarker.setPopupContent(`<b>Sensor GreenRoots</b><br>Humedad: ${humedad}%<br>Lat: ${latitud.toFixed(6)}, Lon: ${longitud.toFixed(6)}`).openPopup();
+                        } else {
+                            // Crea un nuevo marcador
+                            currentMarker = L.marker(newLatLng).addTo(map)
+                                .bindPopup(`<b>Sensor GreenRoots</b><br>Humedad: ${humedad}%<br>Lat: ${latitud.toFixed(6)}, Lon: ${longitud.toFixed(6)}`)
+                                .openPopup();
+                        }
+                        
+                        // Centra el mapa en el marcador, si es la primera vez que se carga o si el cambio es significativo
+                        if (!map.getBounds().contains(newLatLng)) {
+                           map.setView(newLatLng, 13);
+                        }
+                        
+                    } else if (map && latitud !== null && longitud !== null) {
+                        // Caso especial: El mapa está inicializado pero el marcador aún no.
+                        const newLatLng = new L.LatLng(latitud, longitud);
+                        currentMarker = L.marker(newLatLng).addTo(map)
+                            .bindPopup(`<b>Sensor GreenRoots</b><br>Humedad: ${humedad}%<br>Lat: ${latitud.toFixed(6)}, Lon: ${longitud.toFixed(6)}`)
+                            .openPopup();
+                        map.setView(newLatLng, 13);
+                    }
+                    
+                    // 4. Actualizar el estado y la hora
+                    const timeString = new Date().toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit', second: '2-digit'});
+                    estadoElement.innerHTML = `<i class="fas fa-check-circle" style="color: var(--primary-green);"></i> Monitoreando RTDB.`;
+                    ultimaActElement.textContent = timeString;
+
+                } else {
+                    // Si no hay datos, limpia la UI
+                    humElement.textContent = latElement.textContent = lonElement.textContent = '--';
+                    estadoElement.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i> Conectado, pero el nodo /greenroots está vacío.`;
+                    ultimaActElement.textContent = 'N/A';
+                    
+                    // Ocultar notificación
+                    if (notifElement) {
+                        notifElement.style.display = 'none'; 
+                    }
+                    
+                    if (currentMarker) {
+                        map.removeLayer(currentMarker);
+                        currentMarker = null;
+                    }
+                }
+            }, (error) => {
+                console.error("Error al leer datos del sensor:", error);
+                estadoElement.innerHTML = `<i class="fas fa-times-circle" style="color: var(--danger-red);"></i> Error de lectura de datos.`;
+                ultimaActElement.textContent = 'Error';
+            });
+        }
+
+        // ===============================================
+        // 2. FUNCIONES DE UTILIDAD Y BACKEND EXISTENTES (CON CORRECCIÓN)
+        // ===============================================
+        // dashboard.html (dentro del bloque <script>)
+
+// 2. Función para obtener los encabezados de autenticación
+function getAuthHeaders() {
+    // Intenta obtener la información completa del usuario del localStorage
+    const userDataJSON = localStorage.getItem('usuario');
+    
+    if (!userDataJSON) {
+        // Si no hay datos, retorna encabezados vacíos. El backend devolverá 401.
+        return {};
+    }
+
+    const userData = JSON.parse(userDataJSON);
+    
+    // 🚨 CLAVE: El token está dentro del objeto de usuario bajo la clave 'token'
+    const authToken = userData.token; 
+    
+    // Si tienes información de rol que el backend requiere (opcional, pero buena práctica)
+    const userRol = userData.rol;
+
+    const headers = {
+        // Es una buena práctica incluir Content-Type
+        'Content-Type': 'application/json' 
+    };
+
+    if (authToken) {
+        // Formato estándar 'Bearer Token' para autenticación
+        headers['Authorization'] = `Bearer ${authToken}`; 
+    }
+    
+    if (userRol) {
+        headers['X-User-Rol'] = userRol; 
+    }
+
+    return headers;
+}
+        // ... (Tu código de logout, modal, y manejo de registro de árbol se mantiene aquí) ...
+        function getCurrentUserUid() {
+    const userDataJSON = localStorage.getItem("usuario");
+    if (userDataJSON) {
+        const userData = JSON.parse(userDataJSON);
+        // ✅ CORRECTO: Asume que el ID del voluntario está guardado como 'uid' en el objeto de usuario
+        return userData.id; 
+    }
+    return null;
+}
+
+
+async function cargarImpactoAmbiental() {
+    const chartContainer = document.getElementById('impactChart');
+    const chartPanel = chartContainer.closest('.dashboard-panel');
+    const token = userData?.token;
+    
+    if (!token) {
+        if (chartPanel) chartPanel.querySelector('.chart-container').innerHTML = '<p style="color: var(--danger-red); text-align: center; padding: 1rem;">Error: No autenticado.</p>';
+        return;
+    }
+
+    try {
+        // Obtenemos los headers de autenticación (la función getAuthHeaders ya existe)
+        const headers = getAuthHeaders(); 
+        const response = await fetch(`${API_URL}/arboles/mi-impacto`, {
+            method: 'GET',
+            headers: headers,
+        });
+        
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.mensaje || 'Error al obtener los datos del impacto.');
+        }
+
+        // 1. Actualizar la tarjeta de estadísticas con el total de árboles
+        document.getElementById('arbolesPlantados').textContent = data.totalArboles || 0;
+        
+        const chartData = data; 
+        
+        // 2. Destruir la instancia anterior si existe
+        if (impactChartInstance) {
+            impactChartInstance.destroy();
+        }
+
+        // 3. Crear la gráfica con los datos reales del backend
+        impactChartInstance = new Chart(chartContainer.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartData.labels, // Etiquetas de los meses reales (Ene/25, Feb/25...)
+                datasets: [{
+                    label: 'Árboles Plantados (Aprobados)',
+                    data: chartData.data, // Conteo real de árboles
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.4, 
+                    fill: true 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Cantidad de Árboles'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al cargar la gráfica de impacto:", error);
+        if (chartPanel) chartPanel.querySelector('.chart-container').innerHTML = '<p style="color: var(--danger-red); text-align: center; padding: 1rem;">❌ Error al cargar la gráfica de impacto.</p>';
+    }
+}
+
+/**
+ * Llama al API para unir al voluntario al evento.
+ * @param {string} eventoId - El ID del documento del evento en Firestore.
+ * @param {HTMLButtonElement} buttonElement - El botón de "Unirse" que se presionó.
+ */
+async function unirseAEvento(eventoId, buttonElement) {
+    const token = userData?.token;
+    
+    if (!token) {
+        alert('Error de autenticación. Por favor, inicia sesión de nuevo.');
+        return;
+    }
+
+    buttonElement.disabled = true;
+    const originalText = buttonElement.textContent;
+    buttonElement.textContent = 'Uniéndose...';
+    
+    try {
+        const headers = getAuthHeaders(); 
+        const response = await fetch(`${API_URL}/eventos/unirse/${eventoId}`, {
+            method: 'PATCH',
+            headers: headers,
+        });
+        
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.mensaje || 'No se pudo unir al evento.');
+        }
+
+        // Éxito: actualizar el botón
+        buttonElement.textContent = '¡Unido!';
+        buttonElement.classList.add('btn-unido'); // Añadir clase para estilo
+        // Opcional: Recargar la lista de eventos para actualizar el contador de participantes
+        cargarEventos(); 
+
+    } catch (error) {
+        console.error("Error al unirse al evento:", error);
+        alert(`Error al unirse: ${error.message}`);
+        
+        // Revertir el estado del botón en caso de error
+        buttonElement.textContent = originalText;
+        buttonElement.disabled = false;
+        buttonElement.classList.remove('btn-unido');
+    }
+}
+
+async function cargarRanking() {
+    const rankingContainer = document.getElementById('rankingListContainer'); // Asegúrate de que este ID exista en tu HTML
+    if (!rankingContainer) return;
+    
+    rankingContainer.innerHTML = '<p style="padding: 1rem;"><i class="fas fa-spinner fa-spin"></i> Calculando ranking...</p>';
+    
+    const token = userData?.token;
+    const currentUserId = userData?.id; // Usamos 'id' ya que vimos que es la propiedad correcta para el UID
+    
+    if (!token || !currentUserId) {
+        rankingContainer.innerHTML = '<p style="color: var(--text-light); padding: 1rem;">Inicia sesión para ver el ranking.</p>';
+        return;
+    }
+
+    try {
+        const headers = getAuthHeaders(); 
+        const response = await fetch(`${API_URL}/ranking/eventos`, {
+            method: 'GET',
+            headers: headers,
+        });
+        
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            throw new Error(data.mensaje || 'No se pudo obtener el ranking.');
+        }
+
+        const ranking = data.ranking || [];
+
+        if (ranking.length === 0) {
+            rankingContainer.innerHTML = '<p style="color: var(--text-light); padding: 1rem;">Aún no hay participantes en eventos.</p>';
+            return;
+        }
+
+        let rankingHTML = '';
+        let userPosition = -1;
+
+        ranking.forEach((item, index) => {
+            const position = index + 1;
+            const isCurrentUser = item.uid === currentUserId;
+            
+            if (isCurrentUser) {
+                userPosition = position;
+            }
+
+            // Clases CSS para resaltar la fila y el usuario actual
+            const itemClass = `ranking-item ${isCurrentUser ? 'ranking-item-user' : ''} rank-${position}`;
+            
+            rankingHTML += `
+                <div class="${itemClass}">
+                    <span class="rank-position">${position}°</span>
+                    <span class="rank-name">${item.nombre}</span>
+                    <span class="rank-count">${item.count} eventos</span>
+                </div>
+            `;
+        });
+        
+        // Mostrar el ranking en el contenedor principal
+        rankingContainer.innerHTML = rankingHTML;
+        
+        // Mostrar la posición del usuario en una sección dedicada (si existe)
+        const myPositionElement = document.getElementById('myRankPosition');
+        if (myPositionElement) {
+             const myRankItem = ranking.find(r => r.uid === currentUserId);
+             if (userPosition !== -1) {
+                myPositionElement.innerHTML = `Tu posición actual: <strong>${userPosition}°</strong> (${myRankItem.count} eventos)`;
+             } else {
+                 myPositionElement.innerHTML = 'Aún no participas en ningún evento.';
+             }
+        }
+
+    } catch (error) {
+        console.error("Error al cargar el ranking:", error);
+        rankingContainer.innerHTML = `<p style="color: var(--danger-red); padding: 1rem;">Error al cargar el ranking: ${error.message}</p>`;
+    }
+}
+
+// dashboard.html (dentro del bloque <script>)
+
+// ... después de la función unirseAEvento(...)
+
+/**
+ * Función auxiliar para delegar la escucha de eventos click en el contenedor de eventos.
+ * Solo ejecuta unirseAEvento si se pulsa un botón .join-btn no deshabilitado.
+ */
+function handleEventButtonClick(e) {
+    // Usamos closest para encontrar el botón si el click fue dentro de él
+    const button = e.target.closest('.join-btn:not([disabled])');
+    if (button) {
+        const eventoId = button.getAttribute('data-event-id');
+        // Ejecutamos la función de la API
+        unirseAEvento(eventoId, button);
+    }
+}
+// Función principal para cargar los árboles del usuario
+// dashboard.html (dentro del bloque <script>)
+
+async function cargarArboles() {
+    const userId = getCurrentUserUid();
+    const arbolesContainer = document.getElementById('arbolesListContainer');
+
+    if (!userId) {
+        arbolesContainer.innerHTML = '<p class="error-message">Error: No se encontró el ID del usuario logueado.</p>';
+        return;
+    }
+    
+    arbolesContainer.innerHTML = '<p class="loading-message"><i class="fas fa-spinner fa-spin"></i> Cargando árboles...</p>';
+
+    try {
+        const headers = getAuthHeaders();
+
+        // Verificación extra en el frontend antes de la llamada
+        if (!headers['Authorization']) {
+            throw new Error("Acceso denegado. El token de autenticación no está disponible.");
+        }
+
+        const response = await fetch(`${API_URL}/arboles/voluntario/${userId}`, {
+            headers: headers
+        });
+        
+        // 🚨 Manejo específico de errores 401 y 403 (Unauthorized/Forbidden)
+        if (response.status === 401 || response.status === 403) {
+            const errorData = await response.json();
+            // Lanza un error forzado que activará el bloque catch
+            throw new Error(errorData.mensaje || "Tu sesión ha expirado o no tienes permisos. Por favor, vuelve a iniciar sesión.");
+        }
+        
+        const data = await response.json();
+
+        if (!response.ok) {
+             throw new Error(data.mensaje || `Error ${response.status} al obtener la lista de árboles.`);
+        }
+
+        displayArboles(data.arboles || []);
+
+    } catch (error) {
+        console.error("Error al cargar árboles:", error);
+        // Muestra una alerta para el usuario y actualiza el mensaje de la lista
+        alert(`❌ Fallo en la carga de árboles: ${error.message}`); 
+        arbolesContainer.innerHTML = `<p class="error-message">❌ Error de conexión: ${error.message}</p>`;
+        
+        // Si el error es de autenticación, redirigir al login
+        if (error.message.includes('sesión ha expirado')) {
+             // Limpia la sesión
+             localStorage.clear();
+             // Redirige
+             window.location.replace("login.html");
+        }
+    }
+}
+// dashboard.html (dentro del bloque <script>)
+
+// dashboard.html (dentro del bloque <script>)
+
+// Función de ayuda para manejar Timestamps de Firestore y fechas estándar
+// dashboard.html (dentro del bloque <script>)
+
+/**
+ * Función robusta para convertir Timestamps de Firestore o Cadenas ISO 8601 a un objeto Date válido.
+ */
+/**
+ * Función robusta para convertir Timestamps de Firestore o Cadenas ISO 8601 a un objeto Date válido.
+ */
+function convertTimestampToDate(timestamp) {
+    if (!timestamp) return null;
+
+    let date;
+    
+    // 🚨 CORRECCIÓN CLAVE: Verifica si tiene la propiedad '_seconds' (con guion bajo)
+    if (typeof timestamp === 'object' && timestamp.hasOwnProperty('_seconds')) {
+        // Usa la propiedad con guion bajo que confirmamos en la consola
+        date = new Date(timestamp._seconds * 1000); 
+    } 
+    // Opción 2: Si por alguna razón Express serializa sin el guion bajo (fallback)
+    else if (typeof timestamp === 'object' && timestamp.hasOwnProperty('seconds')) {
+        date = new Date(timestamp.seconds * 1000);
+    } 
+    // Opción 3: Manejar cualquier otra cadena o número (Formato ISO)
+    else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+        date = new Date(timestamp);
+    }
+    else {
+        return null; // El formato es desconocido
+    }
+    
+    // 3. Verifica si la conversión resultó en una fecha inválida
+    return isNaN(date.getTime()) ? null : date;
+}
+
+
+/**
+ * Función para renderizar la lista de árboles.
+ */
+function displayArboles(arboles) {
+    const arbolesContainer = document.getElementById('arbolesListContainer');
+    arbolesContainer.innerHTML = ''; 
+
+    if (arboles.length === 0) {
+        arbolesContainer.innerHTML = '<p class="info-message">Aún no has registrado árboles.</p>';
+        return;
+    }
+
+    const list = document.createElement('ul');
+    list.className = 'arboles-list'; 
+    list.style.cssText = 'list-style: none; padding: 0;';
+    
+    arboles.forEach(arbol => {
+        const listItem = document.createElement('li'); 
+        listItem.className = 'arbol-item';
+        
+        // Conversión de fechas con la función corregida
+        const fechaRegistroDate = convertTimestampToDate(arbol.fecharegistro);
+        const fechaRegistro = fechaRegistroDate ? fechaRegistroDate.toLocaleDateString() : 'N/A';
+        
+        const fechaValidacionDate = convertTimestampToDate(arbol.fechavalidacion);
+        const fechaValidacion = fechaValidacionDate ? fechaValidacionDate.toLocaleDateString() : 'Pendiente';
+        
+        // Uso de 'ubicacion' sin acento (CONFIRMADO por el servidor)
+        const ubicacion = arbol.ubicacion || 'Ubicación no registrada'; 
+        
+        const estado = arbol.estadovalidacion || 'Pendiente';
+        const estadoClase = estado.toLowerCase();
+        
+        listItem.innerHTML = `
+            <div class="item-header">
+                <span class="tree-species">${arbol.tipodearbol || 'Tipo Desconocido'}</span>
+                <span class="tree-status status-${estadoClase}">${estado}</span>
+            </div>
+            <p class="item-detail"><i class="fas fa-seedling"></i> ID: ${arbol.id.substring(0, 8)}...</p>
+            <p class="item-detail"><i class="fas fa-calendar-alt"></i> Registrado: ${fechaRegistro}</p>
+            <p class="item-detail"><i class="fas fa-map-marker-alt"></i> Ubicación (GPS): ${ubicacion}</p>
+            <p class="item-detail"><i class="fas fa-check-circle"></i> Fecha Validación: <strong>${fechaValidacion}</strong></p>
+            <p class="item-detail"><i class="fas fa-link"></i> Foto: <a href="${arbol.fotourl}" target="_blank" style="color: var(--accent-green);">Ver Evidencia</a></p>
+        `;
+        list.appendChild(listItem);
+    });
+
+    arbolesContainer.appendChild(list);
+}
+
+        function logout() {
+            localStorage.clear();
+            alert("Has cerrado sesión.");
+            window.location.replace("login.html");
+        }
+
+        // Lógica de Modal
+        btnOpenModal.onclick = function() {
+            modal.style.display = "flex";
+            document.getElementById('registroArbolForm').reset(); 
+        }
+
+        btnCloseModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+
+        // Manejar el Registro del Árbol (CONECTADO AL BACKEND)
+        document.getElementById('registroArbolForm')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitButton = e.submitter;
+            const tipoArbol = document.getElementById('tipoArbol').value;
+            const ubicacionGps = document.getElementById('ubicacionGps').value;
+            const fotoArbol = document.getElementById('fotoArbol').files[0]; 
+            
+            // 1. Obtener el token de autenticación del usuario logeado
+            const authToken = userData?.token; 
+
+            // 2. Comprobación de campos y token (Se requiere el token para el backend protegido)
+            if (!tipoArbol || !ubicacionGps || !fotoArbol) {
+                alert("Error: Por favor, completa todos los campos del formulario.");
+                return;
+            }
+            if (!userData || !authToken) {
+                // Esto resuelve el error 401 y el error de "Acceso denegado. Se requiere token."
+                alert("Error de autenticación: Por favor, inicie sesión de nuevo. Se requiere el token de acceso.");
+                return;
+            }
+
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+            
+            const formData = new FormData();
+            formData.append('voluntarioid', userData.id || userData.email); 
+            formData.append('tipoarbol', tipoArbol); 
+            formData.append('ubicaciongps', ubicacionGps); 
+            formData.append('evidenciaFoto', fotoArbol); 
+
+            try {
+                const response = await fetch(`${API_URL}/arboles/registrar`, {
+                    method: 'POST',
+                    // 3. AGREGAR EL ENCABEZADO DE AUTORIZACIÓN CON EL TOKEN
+                    headers: {
+                        'Authorization': `Bearer ${authToken}` 
+                        // Nota: El navegador gestiona Content-Type automáticamente al usar FormData
+                    },
+                    body: formData 
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    // Muestra el error específico que viene del backend (incluyendo el 401)
+                    console.error("Error en la respuesta del servidor:", result);
+                    alert(`❌ Error al registrar: ${result.mensaje || "Error desconocido. Código HTTP: " + response.status}`); 
+                    throw new Error(result.mensaje || `Fallo en el registro con código ${response.status}`);
+                }
+                
+                alert(`✅ ¡Registro Exitoso! ${result.mensaje}`);
+                document.getElementById('registroArbolForm').reset();
+                modal.style.display = "none";
+                cargarEstadisticas(); 
+                
+            } catch (error) {
+                console.error("Error en el registro:", error);
+                alert("❌ Error de conexión o servidor al registrar el árbol.");
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-leaf"></i> Registrar Árbol';
+            }
+        });
+
+        // Cargar Eventos
+        // dashboard.html (dentro del bloque <script>)
+
+/**
+ * Carga los próximos eventos, verifica la participación del usuario y habilita el botón de unirse.
+ */
+async function cargarEventos() {
+    const eventosContainer = document.getElementById('eventosContainer');
+    eventosContainer.innerHTML = '<p style="padding: 1.5rem;"><i class="fas fa-spinner fa-spin"></i> Cargando eventos...</p>';
+    
+    // 1. Obtener datos de usuario y token
+    const token = userData?.token; 
+    const voluntarioId = userData?.id; // ID del usuario autenticado (necesario para verificar si está unido)
+    
+    if (!userData || !token || !voluntarioId) {
+        eventosContainer.innerHTML = '<p style="color: var(--danger-red); padding: 1.5rem;"><i class="fas fa-user-lock"></i> No autenticado. Inicia sesión para ver las actividades.</p>';
+        return;
+    }
+
+    try {
+        // 2. Realizar la solicitud incluyendo el token de autorización
+        const headers = getAuthHeaders(); // Función que añade el token al header
+        // Usamos la ruta genérica /api/eventos (asumiendo que devuelve activos o la ajustas en tu backend)
+        // Si la ruta /eventos/activos no requiere auth, quita 'headers' del fetch
+        const response = await fetch(`${API_URL}/eventos/activos`, {
+            method: 'GET',
+            headers: headers, // Añadimos el header de autenticación
+        });
+        
+        const data = await response.json();
+
+        if (!response.ok) {
+            eventosContainer.innerHTML = `<p style="color: var(--danger-red); padding: 1.5rem;"><i class="fas fa-exclamation-circle"></i> Error ${response.status}: ${data.mensaje || 'Error al cargar eventos.'}</p>`;
+            return;
+        }
+        
+        const eventos = data.eventos || [];
+        
+        // 3. Actualizar contador en la tarjeta
+        document.getElementById('numEventos').textContent = eventos.length;
+
+        if (eventos.length === 0) {
+            eventosContainer.innerHTML = '<p style="color: var(--text-light); padding: 1.5rem;"><i class="fas fa-info-circle"></i> No hay eventos programados por ahora.</p>';
+            return;
+        }
+        
+        eventosContainer.innerHTML = '';
+        
+        // 4. Renderizar eventos y manejar el estado de participación
+        eventos.slice(0, 5).forEach(evento => { 
+    const fechaObj = new Date(evento.fecha);
+    const esFechaValida = !isNaN(fechaObj.getTime());
+    
+    let dia, mes;
+
+    if (esFechaValida) {
+        dia = fechaObj.getDate().toString().padStart(2, '0');
+        mes = fechaObj.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase().replace('.', '');
+    } else {
+        dia = '??';
+        mes = 'FECHA';
+    }
+    
+    const eventoItem = document.createElement('div');
+    eventoItem.className = 'activity-item';
+    eventoItem.innerHTML = `
+        <div class="activity-date">
+            <span class="day">${dia}</span>
+            <span class="month">${mes}</span>
+        </div>
+        <div class="activity-info">
+            <h4>${evento.titulo}</h4>
+            <p><i class="fas fa-map-marker-alt"></i> ${evento.ubicacion || 'Ubicación pendiente'}</p>
+            <p><i class="fas fa-clock"></i> ${evento.hora || 'Hora pendiente'}</p>
+            <p><i class="fas fa-users"></i> ${evento.participantes.length} participantes</p>
+        </div>
+        <button 
+            class="join-btn ${voluntarioId && (evento.participantes.includes(voluntarioId) ? 'btn-unido' : '')}" 
+            data-event-id="${evento.id}"
+            ${voluntarioId && (evento.participantes.includes(voluntarioId) ? 'disabled' : '')}
+        >
+            ${voluntarioId && (evento.participantes.includes(voluntarioId) ? '¡Unido!' : 'Unirse')}
+        </button>
+    `;
+    eventosContainer.appendChild(eventoItem);
+});
+
+        // 5. Adjuntar el manejador de eventos a los botones (Delegación)
+        // Quitamos el listener anterior antes de añadir uno nuevo para evitar duplicados
+        eventosContainer.removeEventListener('click', handleEventButtonClick);
+        eventosContainer.addEventListener('click', handleEventButtonClick);
+
+    } catch (error) {
+        console.error("Error al obtener eventos:", error);
+        eventosContainer.innerHTML = '<p style="color: var(--danger-red); padding: 1.5rem;"><i class="fas fa-exclamation-circle"></i> Error de conexión con el servidor.</p>';
+    }
+}
+
+        // Cargar Estadísticas (Dummy data)
+        // dashboard.html (Dentro del bloque <script>)
+
+// ... después de getCurrentUserUid() y antes de cargarArboles()
+
+/**
+ * Carga las estadísticas principales del usuario, incluyendo el conteo de árboles.
+ */
+async function cargarEstadisticas() {
+    const userId = getCurrentUserUid();
+    const arbolesPlantadosElement = document.getElementById('arbolesPlantados'); // El span que vamos a actualizar
+
+    if (!userId) {
+        arbolesPlantadosElement.textContent = '---';
+        console.error("Error: ID de usuario no disponible para cargar estadísticas.");
+        return;
+    }
+
+    try {
+        const headers = getAuthHeaders(); // Función existente para obtener el token
+        // Usar el nuevo endpoint
+        const response = await fetch(`${API_URL}/voluntario/arboles/count`, { headers: headers });
+        const data = await response.json();
+
+        if (!response.ok || !data.ok) {
+            console.error("Error al obtener estadísticas:", data.mensaje);
+            arbolesPlantadosElement.textContent = 'Error';
+            return;
+        }
+
+        const totalArboles = data.totalArboles || 0;
+        
+        // Actualizar el contador de árboles plantados con el número real
+        arbolesPlantadosElement.textContent = totalArboles;
+
+    } catch (error) {
+        console.error("Error de red al cargar estadísticas:", error);
+        arbolesPlantadosElement.textContent = 'Fail';
+    }
+}
+// ... resto de tu código
+
+
+        // ===============================================
+        // 3. LÓGICA DE INICIO Y EVENTOS
+        // ===============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isAllowed) {
+                // Mostrar nombre de usuario
+                if (userData) {
+                    const nombre = userData.nombre || userData.email || 'Voluntario';
+                    document.getElementById('userName').textContent = nombre;
+                    document.getElementById('saludoNombre').textContent = nombre;
+                }
+                
+                // --- LÓGICA NUEVA PARA EL TOGGLE DE ÁRBOLES ---
+                const arbolesSection = document.getElementById('arbolesRegistradosSection');
+                const arbolesStatCard = document.getElementById('arbolesStatCard');
+                const arbolesToggleArrow = document.getElementById('arbolesToggleArrow'); // 🚨 NUEVO: Referencia a la flecha
+                const token = userData ? userData.token : null;
+                // 🚨 ACCIÓN 1: Ocultar la sección de árboles por defecto
+                arbolesSection.classList.add('hidden-section'); 
+                // La flecha empieza no rotada (apuntando a la derecha)
+
+                // 🚨 ACCIÓN 2: Asignar el evento de click a la tarjeta
+                arbolesStatCard?.addEventListener('click', () => {
+                    // Muestra/Oculta la sección
+                    arbolesSection.classList.toggle('hidden-section');
+                    
+                    // 🚨 NUEVO: Rota la flecha
+                    arbolesToggleArrow.classList.toggle('rotated');
+                    
+                    // Si la sección NO está oculta, cargar/refrescar los datos.
+                    if (!arbolesSection.classList.contains('hidden-section')) {
+                        cargarArboles(); 
+                    }
+                });
+                // --- FIN LÓGICA TOGGLE ---
+                document.getElementById('arbolesRegistradosSection').classList.add('hidden-section');
+
+
+                // 1. Inicializa el mapa ANTES de cualquier cosa (para asegurar que el contenedor esté listo)
+                initializeMap();
+                
+                // 2. Inicializa Firebase, y si tiene éxito, inicia el monitoreo.
+                initializeFirebase().then((success) => {
+                    if (success) {
+                        loadSensorData(); 
+                    }else {
+        // Manejar el caso de que Firebase falle al inicializar
+        document.getElementById('soil-quality-value').textContent = 'Error';
+        document.getElementById('soil-quality-status').textContent = 'Fallo de Firebase.';
+        document.getElementById('soil-quality-status').classList.add('negative');
+    }
+                });
+    
+                // 3. Cargar datos de la API (no dependientes de Firebase)
+                cargarEventos();
+                cargarEstadisticas();
+                cargarRanking();
+                cargarImpactoAmbiental();
+                /** 4. Gráfico (Chart.js)
+                const ctx = document.getElementById('impactChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Árboles Plantados',
+                            data: [2, 5, 8, 12, 15, 18],
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.3,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });**/
+                
+                // 5. Lógica de Menú Móvil
+                const hamburger = document.querySelector('.hamburger');
+                const navMenu = document.querySelector('.nav-menu');
+                const userMenu = document.querySelector('.user-menu');
+
+                hamburger.addEventListener('click', () => {
+                    navMenu.classList.toggle('open');
+                    userMenu.classList.toggle('open');
+                    hamburger.classList.toggle('active');
+                });
+            }
+        });
+        // Asignar el evento al botón de refresco
+    document.getElementById('refreshArbolesBtn')?.addEventListener('click', () => {
+        cargarArboles();
+    });
+        // Asignar el evento al botón de refresco
+        document.getElementById('refreshEventosBtn')?.addEventListener('click', () => {
+            cargarEventos();
+        });
+
+        // Hacer la función logout accesible globalmente
+        window.logout = logout; 
+
+
+    </script>
+</body>
+</html>
